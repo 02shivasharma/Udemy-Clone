@@ -5,7 +5,7 @@ import { AuthContext } from '@/context/auth-context'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
 import { GraduationCap } from 'lucide-react'
 import React, { useContext, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
 export const AuthPage = () => {
     const [activeTab, setActiveTab] = useState('signin');
@@ -14,8 +14,12 @@ export const AuthPage = () => {
         signInFormData,
         setSignInFormData,
         signUpFormData, 
-        setSignUpFormData
-    } = useContext(AuthContext)
+        setSignUpFormData,
+        handleRegisterUser,
+        handleSignInUser
+    } = useContext(AuthContext);
+
+    console.log(signInFormData)
 
      function checkSignInDisable() {
         return( signInFormData && signInFormData.userEmail !== "" && signInFormData.password !== "");
@@ -59,6 +63,7 @@ export const AuthPage = () => {
              formData={signInFormData} 
              setFormData={setSignInFormData}
              isButtonDisabled={!checkSignInDisable()}
+             handleSubmit={handleSignInUser}
               />
 
            </CardContent>
@@ -76,6 +81,7 @@ export const AuthPage = () => {
              formData={signUpFormData} 
              setFormData={setSignUpFormData}
              isButtonDisabled={!checkSignUpDisable()}
+             handleSubmit={handleRegisterUser}
              />
              
            </CardContent>
