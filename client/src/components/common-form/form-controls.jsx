@@ -1,14 +1,20 @@
-import { Label } from "@radix-ui/react-label";
+import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { Select, SelectContent,  SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
-import { Textarea } from "../ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";import { Textarea } from "../ui/textarea";
 
-function FormControls({formControls = [], formData, setFormData}) {
+function 
+FormControls({formControls = [], formData, setFormData}) {
 
     function renderComponentByType(getControlItem){
         let element = null;
 
-        const currentControlItemValue = formData[getControlItem.name] || ""
+        const currentControlItemValue = formData[getControlItem.name] || "";
 
         switch (getControlItem.componentType){
             case "input" : 
@@ -40,12 +46,12 @@ function FormControls({formControls = [], formData, setFormData}) {
                     value={currentControlItemValue}
                     >
                       <SelectTrigger className="w-full">
-                       <SelectValue placeholder="Select a fruit" />
+                       <SelectValue placeholder={getControlItem.label} />
                       </SelectTrigger>
                       <SelectContent>
                        {getControlItem.options && getControlItem.options.length > 0
                         ? getControlItem.options.map((optionItem) => (
-                            <SelectItem key={optionItem.id} value={optionItem.id}>
+                            <SelectItem key={optionItem.id} value={optionItem.label}>
                             {optionItem.label}
                             </SelectItem>
                         ))

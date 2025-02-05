@@ -2,7 +2,7 @@ import Commonform from '@/components/common-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { signInFormControls, signUpFormControls } from '@/config'
 import { AuthContext } from '@/context/auth-context'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { GraduationCap } from 'lucide-react'
 import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom';
