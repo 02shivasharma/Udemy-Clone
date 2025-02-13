@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const authRouter = require("./routes/auth-routes")
+const authRouter = require("./routes/auth-routes");
+const mediaRoutes = require("./routes/instructor-routes/media-route")
 
 
 
@@ -23,6 +24,7 @@ mongoose.connect(MONGO_URL).then(()=>console.log("mongodb is connected "))
 .catch((e)=> console.log(e));
 
 app.use("/auth", authRouter);
+app.use("/media", mediaRoutes);
 
 app.use((err, req, res, next)=>{
     console.log(err.stack);

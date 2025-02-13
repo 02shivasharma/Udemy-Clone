@@ -9,13 +9,17 @@ export const InstructorContext = createContext(null);
 export default function InstructorProvider({children}){
   const [courseLandingFormData, setCourseLandingFormData] = useState(courseLandingInitialFormData);
   const [courseCurriculumFromData, setCourseCurriculumFromData] = useState(courseCurriculumInitialFormData);
+  const [mediaUploadProgress, setMediaUploadProgress] = useState(false);
+  const [mediaUploadProgressPercentage, setMediaUploadProgressPercentage] = useState(0)
     return (
 
 
         <InstructorContext.Provider value={
            { courseLandingFormData,
             setCourseLandingFormData,
-            courseCurriculumFromData, setCourseCurriculumFromData
+            courseCurriculumFromData, setCourseCurriculumFromData,
+            mediaUploadProgress, setMediaUploadProgress,
+            mediaUploadProgressPercentage, setMediaUploadProgressPercentage
             }
         }>
         {children}
