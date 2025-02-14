@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { courseCurriculumInitialFormData } from "@/config";
 import { InstructorContext } from "@/context/instructor-context";
-import { mediaUploadService } from "@/services";
+import { mediaUploadService, mediaDeleteService } from "@/services";
 import { useContext } from "react";
+import VideoPlayer from "@/components/video-player";
+import { EuiLoadingLogo } from "@elastic/eui";
 
 
 
@@ -60,6 +62,29 @@ function CourseCurriculum() {
         
      }
    }
+   function isCourseCurriculumFormDataValid(){
+      return  courseCurriculumFromData.every((item) => {
+         return (
+            item && 
+            typeof item === "object" && 
+            item.title.trim() !== "" &&
+            item.videoUrl.trim() !== ""
+         )
+      })
+   }
+  async function handleReplaceVideo(currentIndex){
+       let cpyCourseCurriculumData = [...courseCurriculumFromData];
+       const getCurrentVideoPublicId = cpyCourseCurriculumData[currentIndex].public_id;
+       const mediaDeleteResponse = await mediaDeleteService(getCurrentVideoPublicId);
+
+       if(mediaDeleteResponse.success){
+         setCourseCurriculumFromData(prevData =>
+            prevData.map((item, index)=> index === currentIndex ? 
+              {...item , videoUrl : '', public_id : ''} : item
+            )
+         )
+       }
+   }
     console.log(courseCurriculumFromData)
     return ( 
        <Card>
@@ -67,7 +92,7 @@ function CourseCurriculum() {
          <CardTitle>Create Course Curriculum</CardTitle>
         </CardHeader>
         <CardContent>
-         <Button onClick={handleNewLecture}>Add Lecture</Button>
+         <Button disabled={!isCourseCurriculumFormDataValid() || mediaUploadProgress} onClick={handleNewLecture}>Add Lecture</Button>
          {mediaUploadProgress ? (
             <MediaProgressBar
             isMediaUploading={mediaUploadProgress}
@@ -94,24 +119,36 @@ function CourseCurriculum() {
                 />
                 <Label htmlFor={`freePreview-${index + 1}`} >Free Preview</Label>
                </div>
-             </div>
-             <div className="mt-6">
-                 <Input 
-                type="file"
-                accept="video/*"
-                onChange={(event) => handleSingleLectureUpload(event, index)}
-                className="mb-4"
-                />
-             </div>
-          
-             
+                </div>
+                <div className="mt-6">
+                {
+                  
+                  courseCurriculumFromData[index]?.videoUrl ? (
+                     <div className="flex gap-3">
+                      <VideoPlayer 
+                      url={courseCurriculumFromData[index]?.videoUrl}
+                      width="450px"
+                      height="200px"
+                       
+                      />
+                      <Button onClick={()=> handleReplaceVideo(index)}>Replace Video</Button>
+                      <Button className="bg-red-900">Delete Lecture</Button> 
+                     </div>
+                  )
+                  : (
+                     <Input 
+                      type="file"
+                      accept="video/*"
+                      onChange = {(event) => handleSingleLectureUpload(event, index)}
+                      className="mb-4"
+                      />
+                  ) }       
+               </div>
             </div>
          )
          )
-         }
-         
+         }    
          </div>
-
         </CardContent>
        </Card>
      );
