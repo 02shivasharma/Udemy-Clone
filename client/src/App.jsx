@@ -42,6 +42,15 @@ const { auth }  = useContext(AuthContext);
         
         />}
        />
+         <Route 
+        path="/instructor/edit-course/:id"
+        element={<RouteGuard 
+        authenticated={auth?.authenticate}
+        user={auth?.user}
+        element={<AddNewCoursePage />}
+        
+        />}
+       />
        <Route
        path="/"
        element={

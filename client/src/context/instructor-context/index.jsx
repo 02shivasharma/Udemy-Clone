@@ -10,7 +10,9 @@ export default function InstructorProvider({children}){
   const [courseLandingFormData, setCourseLandingFormData] = useState(courseLandingInitialFormData);
   const [courseCurriculumFromData, setCourseCurriculumFromData] = useState(courseCurriculumInitialFormData);
   const [mediaUploadProgress, setMediaUploadProgress] = useState(false);
-  const [mediaUploadProgressPercentage, setMediaUploadProgressPercentage] = useState(0)
+  const [mediaUploadProgressPercentage, setMediaUploadProgressPercentage] = useState(0);
+  const [instructorCourseList, setInstructorCourseList] = useState([]);
+  const [currentEditedCourseId, setCurrentEditedCourseId] = useState(null)
     return (
 
 
@@ -19,7 +21,9 @@ export default function InstructorProvider({children}){
             setCourseLandingFormData,
             courseCurriculumFromData, setCourseCurriculumFromData,
             mediaUploadProgress, setMediaUploadProgress,
-            mediaUploadProgressPercentage, setMediaUploadProgressPercentage
+            mediaUploadProgressPercentage, setMediaUploadProgressPercentage,
+            instructorCourseList, setInstructorCourseList,
+            currentEditedCourseId, setCurrentEditedCourseId
             }
         }>
         {children}

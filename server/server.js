@@ -3,8 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const authRouter = require("./routes/auth-routes");
-const mediaRoutes = require("./routes/instructor-routes/media-route")
-
+const mediaRoutes = require("./routes/instructor-routes/media-route");
+const instructorCourseRoutes = require("./routes/instructor-routes/course-route");
 
 
 
@@ -25,6 +25,7 @@ mongoose.connect(MONGO_URL).then(()=>console.log("mongodb is connected "))
 
 app.use("/auth", authRouter);
 app.use("/media", mediaRoutes);
+app.use("/instructor/course", instructorCourseRoutes);
 
 app.use((err, req, res, next)=>{
     console.log(err.stack);

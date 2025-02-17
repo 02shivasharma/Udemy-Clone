@@ -11,7 +11,7 @@ import {
 import { Delete, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-function InstructorCourses() {
+function InstructorCourses({listOfCourses = []}) {
     const navigate = useNavigate();
     return ( 
        <Card>
@@ -35,23 +35,31 @@ function InstructorCourses() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-               <TableRow>
-                <TableCell className="font-medium">React Js Full Course</TableCell>
-                <TableCell className="font-medium">100</TableCell>
-                <TableCell className="font-medium">$5000</TableCell>
-                <TableCell className="font-medium">
-                 <Button 
-                          variant = "ghost">
-                   <Edit className="h-6 w-6"/>
-                 </Button>
-                 <Button
-                          variant = "ghost"
-                          size="sm">
-                    <Delete className="h-6 w-6"/>
-                 </Button>
-                </TableCell>
-
-               </TableRow>
+               {listOfCourses && listOfCourses.length > 0 ? 
+                listOfCourses.map(course => 
+                  <TableRow key={course.title}>
+                   <TableCell className="font-medium">
+                     {course?.title}
+                   </TableCell>
+                   <TableCell >{course.student?.length}</TableCell>
+                   <TableCell> {course.pricing}</TableCell>
+                   <TableCell className="text-right">
+                    <Button 
+                    onClick={
+                      ()=>{
+                        navigate(`/instructor/edit-course/${course?._id}`);
+                      }
+                    }
+                    variant='ghost' size="sm">
+                     <Edit className="h-6 w-6" />
+                    </Button>
+                     <Button variant='ghost' size="sm">
+                     <Delete className="h-6 w-6" />
+                    </Button>
+                   </TableCell> 
+                  </TableRow>
+                ) : null
+               }
               </TableBody>
            </Table>
           </div>
