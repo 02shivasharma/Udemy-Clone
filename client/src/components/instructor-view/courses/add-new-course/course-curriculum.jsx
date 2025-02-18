@@ -85,6 +85,17 @@ function CourseCurriculum() {
          )
        }
    }
+   
+   async function handleDeleteVideo(currentIndex){
+     let cpyCourseCurriculumData = courseCurriculumFromData.filter((_, index)=> index !== currentIndex);
+     const getCurrentSelectedVideoPublicId = cpyCourseCurriculumData[currentIndex]?.public_id;
+     const response = await mediaDeleteService(getCurrentSelectedVideoPublicId);
+     if(response.success){
+      cpyCourseCurriculumData = cpyCourseCurriculumData.filter((_, index)=> index !== currentIndex)
+       setCourseCurriculumFromData(cpyCourseCurriculumData);
+     }
+   }
+
     function handleOpenBulkUploadDialog() {
     bulkUploadInputRef.current?.click();
   }
@@ -123,16 +134,14 @@ function CourseCurriculum() {
             : [...courseCurriculumFromData];
 
         cpyCourseCurriculumFormdata = [
-          ...cpyCourseCurriculumFormdata,
-          ...response?.data.map((item, index) => ({
-            videoUrl: item?.url,
-            public_id: item?.public_id,
-            title: `Lecture ${
-              cpyCourseCurriculumFormdata.length + (index + 1)
-            }`,
-            freePreview: false,
-          })),
-        ];
+  ...cpyCourseCurriculumFormdata,
+  ...(Array.isArray(response?.data) ? response.data.map((item, index) => ({
+    videoUrl: item?.url,
+    public_id: item?.public_id,
+    title: `Lecture ${cpyCourseCurriculumFormdata.length + (index + 1)}`,
+    freePreview: false,
+  })) : []) // If response?.data is undefined, use an empty array
+];
         setCourseCurriculumFromData(cpyCourseCurriculumFormdata);
         setMediaUploadProgress(false);
       }
@@ -209,7 +218,7 @@ function CourseCurriculum() {
                        
                       />
                       <Button onClick={()=> handleReplaceVideo(index)}>Replace Video</Button>
-                      <Button className="bg-red-900">Delete Lecture</Button> 
+                      <Button onClick={()=> handleDeleteVideo(index)} className="bg-red-900">Delete Lecture</Button> 
                      </div>
                   )
                   : (
