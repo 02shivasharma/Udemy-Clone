@@ -8,17 +8,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { courseCurriculumInitialFormData, courseLandingInitialFormData } from "@/config";
+import { InstructorContext } from "@/context/instructor-context";
 import { Delete, Edit } from "lucide-react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 function InstructorCourses({listOfCourses = []}) {
     const navigate = useNavigate();
+    const { currentEditedCourseId,setCurrentEditedCourseId, setCourseLandingFormData, setCourseCurriculumFromData} = useContext(InstructorContext);
     return ( 
        <Card>
          <CardHeader className="flex justify-between flex-row items-center">
          <CardTitle className="text-3xl font-extrabold ">All Courses</CardTitle>
          <Button
-          onClick={()=> navigate("/instructor/create-new-course")}
+          onClick={()=> {
+            setCurrentEditedCourseId(null);
+            setCourseCurriculumFromData(courseCurriculumInitialFormData);
+            setCourseLandingFormData(courseLandingInitialFormData);
+            console.log(currentEditedCourseId, "tHIS IS THE currentEditedJCourseId");
+            navigate("/instructor/create-new-course");
+          }}
           className="p-6">
           Create New Course
          </Button> 

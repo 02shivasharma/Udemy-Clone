@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { courseCurriculumInitialFormData, courseLandingInitialFormData } from "@/config";
 import { AuthContext } from "@/context/auth-context";
 import { InstructorContext } from "@/context/instructor-context";
-import { addNewCourseService, fetchInstructorCourseDetailsService } from "@/services";
+import { addNewCourseService, fetchInstructorCourseDetailsService, updateCourseByIdService } from "@/services";
 import { useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -64,13 +64,19 @@ function AddNewCoursePage() {
   isPublised: true,
   }
 
-   const response = await addNewCourseService(formData);
+   const response = 
+    currentEditedCourseId !== null ? 
+    await updateCourseByIdService(currentEditedCourseId, 
+      formData
+    )
+    :
+    await addNewCourseService(formData);
 
    if(response?.success){
     setCourseCurriculumFromData(courseCurriculumInitialFormData);
     setCourseLandingFormData(courseLandingInitialFormData);
     navigate(-1);
-    setCourses((prevCourses) => [...prevCourses, formData]);
+    setCurrentEditedCourseId(null)
    }
    
 
@@ -102,6 +108,7 @@ function AddNewCoursePage() {
   useEffect(() => {
     if (params?.id) setCurrentEditedCourseId(params?.id);
   }, [params?.id]);
+
     return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between">
