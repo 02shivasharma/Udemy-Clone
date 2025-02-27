@@ -13,13 +13,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { filterOptions, sortOptions } from "@/config";
 // import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
+import { AuthContext } from "@/context/auth-context";
+
 import {
+  checkCoursePurchaseInfoService,
   // checkCoursePurchaseInfoService,
   fetchStudentCourseListService,
 } from "@/services";
 import { ArrowUpDownIcon } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -45,8 +49,8 @@ function StudentViewCoursesPage() {
     loadingState,
     setLoadingState,
   } = useContext(StudentContext);
-  // const navigate = useNavigate();
-  // const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
 
   function handleFilterOnChange(getSectionId, getCurrentOption) {
     let cpyFilters = { ...filters };
@@ -87,20 +91,20 @@ function StudentViewCoursesPage() {
     }
   }
 
-  // async function handleCourseNavigate(getCurrentCourseId) {
-  //   const response = await checkCoursePurchaseInfoService(
-  //     getCurrentCourseId,
-  //     auth?.user?._id
-  //   );
-
-  //   if (response?.success) {
-  //     if (response?.data) {
-  //       navigate(`/course-progress/${getCurrentCourseId}`);
-  //     } else {
-  //       navigate(`/course/details/${getCurrentCourseId}`);
-  //     }
-  //   }
-  // }
+ async function handleCourseNavigate(getCurrentCourseId) {
+    const response = await checkCoursePurchaseInfoService(
+      getCurrentCourseId,
+      auth?.user?._id
+    );
+ console.log(response.success);
+    if (response?.success) {
+      if (response?.data) {
+        navigate(`/course-progress/${getCurrentCourseId}`);
+      } else {
+        navigate(`/course/details/${getCurrentCourseId}`);
+      }
+    }
+  }
 
   useEffect(() => {
     const buildQueryStringForFilters = createSearchParamsHelper(filters);
@@ -123,7 +127,6 @@ function StudentViewCoursesPage() {
     };
   }, []);
 
-  console.log(loadingState, "loadingState");
 
   return (
     <div className="container mx-auto p-4">
@@ -193,7 +196,7 @@ function StudentViewCoursesPage() {
             {studentCoursesList && studentCoursesList.length > 0 ? (
               studentCoursesList.map((courseItem) => (
                 <Card
-                  // onClick={() => handleCourseNavigate(courseItem?._id)}
+                  onClick={() => handleCourseNavigate(courseItem._id)}
                   className="cursor-pointer"
                   key={courseItem?._id}
                 >

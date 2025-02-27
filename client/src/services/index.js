@@ -90,3 +90,10 @@ export async function fetchStudentCourseDetailsService(courseId) {
 
   return data;
 }
+
+export async function checkCoursePurchaseInfoService(id, studentId) {
+  const { data } = await axiosInstance.get(
+    `/student/course/purchase-info/${id}/${studentId}`
+  )
+  return data;
+}
