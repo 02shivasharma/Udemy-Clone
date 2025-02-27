@@ -4,15 +4,15 @@ import './index.css'
 import App from './App.jsx'
 import AuthProvider from './context/auth-context'
 import InstructorProvider from './context/instructor-context'
-import { StudenetProvider } from './context/student-context'
+import  StudentProvider  from './context/student-context'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <InstructorProvider>
-      <StudenetProvider>
+      <StudentProvider>
        <App />
-      </StudenetProvider>
+      </StudentProvider>
       </InstructorProvider>
     </AuthProvider>
   </StrictMode>,

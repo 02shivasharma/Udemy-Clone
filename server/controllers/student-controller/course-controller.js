@@ -1,28 +1,69 @@
 
 const Course = require("../.././models/Courses");
 
-const getAllStudentViewCourses = async (req, res)=> {
-    try{
-     const courseList = await Course.find({});
+const getAllStudentViewCourses = async (req, res) => {
+  try {
+    const {
+      category = "",
+      level = "",
+      primaryLanguage = "",
+      sortBy = "price-lowtohigh",
+    } = req.query;
 
-     if(courseList.length === 0){
-        return res.status(404).json({
-            success : false,
-            message : "No Course found",
-            data : [],
-        })
-     }
-     res.status(200).json({
-        success : true,
-        data : courseList
-     })
-    }catch(e){
-        console.log(e);
-        res.status(500).json({
-
-        })
-    }
+    console.log(req.query, "req.query");
+let filters = {};
+if (category && category.trim() !== "") {
+  filters.category = { $in: category.split(",") };
 }
+if (level && level.trim() !== "") {
+  filters.level = { $in: level.split(",") };
+}
+if (primaryLanguage && primaryLanguage.trim() !== "") {
+  filters.primaryLanguage = { $in: primaryLanguage.split(",") };
+}
+console.log("Filters", filters);
+
+    let sortParam = {};
+    switch (sortBy) {
+      case "price-lowtohigh":
+        sortParam.pricing = 1;
+
+        break;
+      case "price-hightolow":
+        sortParam.pricing = -1;
+
+        break;
+      case "title-atoz":
+        sortParam.title = 1;
+
+        break;
+      case "title-ztoa":
+        sortParam.title = -1;
+
+        break;
+
+      default:
+        sortParam.pricing = 1;
+        break;
+    }
+
+      console.log("Filters", filters);
+    console.log("Sample course from DB:", await Course.findOne({}))
+
+    const coursesList = await Course.find(filters).sort(sortParam);
+    console.log("courseList", coursesList.length);
+    res.status(200).json({
+      success: true,
+      data: coursesList,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
 
 const getStudentViewcourseDetails = async ( req, res) => {
     try{
