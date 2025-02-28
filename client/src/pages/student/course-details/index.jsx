@@ -11,13 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import VideoPlayer from "@/components/video-player";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
 import { CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
-import { useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import {StudentContext } from "@/context/student-context";
-import { fetchStudentCourseDetailsService} from "@/services";
-
+import { fetchStudentCourseDetailsService, createPaymentService} from "@/services";
  function StudentViewCourseDetailPage(){
 
   const {
@@ -29,9 +28,15 @@ import { fetchStudentCourseDetailsService} from "@/services";
     setLoadingState,
   } = useContext(StudentContext);
  
- const { id } = useParams();
+  const { id } = useParams();
+  const { auth } = useContext(AuthContext);
+  const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState(null);
+  const [showFreePreviewDialog, setShowFreePreviewDialog] = useState(false);
+  const [approvalUrl, setApprovalUrl] = useState("");
+  // const navigate = useNavigate();
+  const location = useLocation();
 
-  async function fetchStudentViewCourseDetails() {
+  async function fetchStudentViewCourseDetails( ) {
 
     const response = await fetchStudentCourseDetailsService(currentCourseDetailsId);
     if(response?.success){
@@ -43,6 +48,46 @@ import { fetchStudentCourseDetailsService} from "@/services";
     }
     console.log(response.data)
   }
+
+  async function handleCreatePayment (){
+          const paymentPayload = {
+      userId: auth?.user?._id,
+      userName: auth?.user?.userName,
+      userEmail: auth?.user?.userEmail,
+      orderStatus: "pending",
+      paymentMethod: "paypal",
+      paymentStatus: "initiated",
+      orderDate: new Date(),
+      paymentId: "",
+      payerId: "",
+      instructorId: studentViewCourseDetails?.instructorId,
+      instructorName: studentViewCourseDetails?.instructorName,
+      courseImage: studentViewCourseDetails?.image,
+      courseTitle: studentViewCourseDetails?.title,
+      courseId: studentViewCourseDetails?._id,
+      coursePricing: studentViewCourseDetails?.pricing,
+    };
+
+  const response = await createPaymentService(paymentPayload);
+     if (response.success) {
+      sessionStorage.setItem(
+        "currentOrderId",
+        JSON.stringify(response?.data?.orderId)
+      );
+      setApprovalUrl(response?.data?.approveUrl);
+    }
+  }
+  
+
+  async function  handleSetFreePreview(getCurrentVideoInfo) {
+    console.log("getCurrentVIdorIfor", getCurrentVideoInfo);
+    setDisplayCurrentVideoFreePreview(getCurrentVideoInfo?.videoUrl);
+  }
+
+   useEffect(() => {
+    if (displayCurrentVideoFreePreview !== null) setShowFreePreviewDialog(true);
+  }, [displayCurrentVideoFreePreview]);
+
    useEffect(() => {
     console.log(currentCourseDetailsId, "currentCourseDetailsId"
       
@@ -51,9 +96,32 @@ import { fetchStudentCourseDetailsService} from "@/services";
     if (currentCourseDetailsId !== null) fetchStudentViewCourseDetails();
   }, [currentCourseDetailsId]);
 
+    useEffect(() => {
+    if (!location.pathname.includes("course/details")){
+      setStudentViewCourseDetails(null);
+        setCurrentCourseDetailsId(null);
+        }
+   }, [location.pathname]);
+
   useEffect(() => {
     if (id) setCurrentCourseDetailsId(id);
   }, [id]);
+
+ if (loadingState) return <Skeleton />;
+
+  if (approvalUrl !== "") {
+    window.location.href = approvalUrl;
+  }
+
+
+  const getIndexOfFreePreviewUrl =
+    studentViewCourseDetails !== null
+      ? studentViewCourseDetails?.curriculum?.findIndex(
+          (item) => item.freePreview
+        )
+      : -1;
+
+ console.log("currentVdieoPreview ", displayCurrentVideoFreePreview);
 
     return ( 
          <div className=" mx-auto p-4">
@@ -116,11 +184,11 @@ import { fetchStudentCourseDetailsService} from "@/services";
                         ? "cursor-pointer"
                         : "cursor-not-allowed"
                     } flex items-center mb-4`}
-                    // onClick={
-                    //   curriculumItem?.freePreview
-                    //     ? () => handleSetFreePreview(curriculumItem)
-                    //     : null
-                    // }
+                    onClick={
+                      curriculumItem?.freePreview
+                        ? () => handleSetFreePreview(curriculumItem)
+                        : null
+                    }
                   >
                     {curriculumItem?.freePreview ? (
                       <PlayCircle className="mr-2 h-4 w-4" />
@@ -139,13 +207,13 @@ import { fetchStudentCourseDetailsService} from "@/services";
             <CardContent className="p-6">
               <div className="aspect-video mb-4 rounded-lg flex items-center justify-center">
                 <VideoPlayer
-                  // url={
-                  //   getIndexOfFreePreviewUrl !== -1
-                  //     ? studentViewCourseDetails?.curriculum[
-                  //         getIndexOfFreePreviewUrl
-                  //       ].videoUrl
-                  //     : ""
-                  // }
+                  url={
+                    getIndexOfFreePreviewUrl !== -1
+                      ? studentViewCourseDetails?.curriculum[
+                          getIndexOfFreePreviewUrl
+                        ].videoUrl
+                      : ""
+                  }
                   width="450px"
                   height="200px"
                 />
@@ -156,7 +224,7 @@ import { fetchStudentCourseDetailsService} from "@/services";
                 </span>
               </div>
               <Button
-              //  onClick={handleCreatePayment} 
+               onClick={handleCreatePayment} 
                className="w-full">
                 Buy Now
               </Button>
@@ -165,11 +233,11 @@ import { fetchStudentCourseDetailsService} from "@/services";
         </aside>
       </div>
       <Dialog
-        // open={showFreePreviewDialog}
-        // onOpenChange={() => {
-        //   setShowFreePreviewDialog(false);
-        //   setDisplayCurrentVideoFreePreview(null);
-        // }}
+        open={showFreePreviewDialog}
+        onOpenChange={() => {
+          setShowFreePreviewDialog(false);
+          setDisplayCurrentVideoFreePreview(null);
+        }}
       >
         <DialogContent className="w-[800px]">
           <DialogHeader>
@@ -177,7 +245,7 @@ import { fetchStudentCourseDetailsService} from "@/services";
           </DialogHeader>
           <div className="aspect-video rounded-lg flex items-center justify-center">
             <VideoPlayer
-              // url={displayCurrentVideoFreePreview}
+              url={displayCurrentVideoFreePreview}
               width="450px"
               height="200px"
             />
@@ -187,8 +255,8 @@ import { fetchStudentCourseDetailsService} from "@/services";
               ?.filter((item) => item.freePreview)
               .map((filteredItem, index) => (
                 <p key={index}
-                  // onClick={() => handleSetFreePreview(filteredItem)}
-                  // className="cursor-pointer text-[16px] font-medium"
+                  onClick={() => handleSetFreePreview(filteredItem)}
+                  className="cursor-pointer text-[16px] font-medium"
                 >
                   {filteredItem?.title}
                 </p>
